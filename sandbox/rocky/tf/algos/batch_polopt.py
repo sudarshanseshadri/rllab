@@ -103,15 +103,17 @@ class BatchPolopt(RLAlgorithm):
         if sess is None:
             sess = tf.Session()
             sess.__enter__()
-            
+
         sess.run(tf.global_variables_initializer())
         self.start_worker()
         start_time = time.time()
+        data = []
         for itr in range(self.start_itr, self.n_itr):
             itr_start_time = time.time()
             with logger.prefix('itr #%d | ' % itr):
                 logger.log("Obtaining samples...")
                 paths = self.obtain_samples(itr)
+                data.append(paths)
                 logger.log("Processing samples...")
                 samples_data = self.process_samples(itr, paths)
                 logger.log("Logging diagnostics...")
@@ -135,6 +137,7 @@ class BatchPolopt(RLAlgorithm):
         self.shutdown_worker()
         if created_session:
             sess.close()
+        return data
 
     def log_diagnostics(self, paths):
         self.env.log_diagnostics(paths)

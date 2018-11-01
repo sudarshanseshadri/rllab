@@ -5,6 +5,7 @@ import tensorflow as tf
 
 from rllab.misc.console import query_yes_no
 from rllab.sampler.utils import rollout
+import numpy as np
 
 if __name__ == "__main__":
 
@@ -27,6 +28,7 @@ if __name__ == "__main__":
         env = data['env']
         while True:
             path = rollout(env, policy, max_path_length=args.max_path_length,
-                           animated=True, speedup=args.speedup)
+                           animated=True, speedup=args.speedup, always_return_paths=True)
+            print(np.sum(path['rewards']))
             if not query_yes_no('Continue simulation?'):
                 break

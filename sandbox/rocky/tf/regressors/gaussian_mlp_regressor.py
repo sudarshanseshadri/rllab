@@ -212,6 +212,7 @@ class GaussianMLPRegressor(LayersPowered, Serializable):
         if self._use_trust_region:
             logger.record_tabular(prefix + 'MeanKL', self._optimizer.constraint_val(inputs))
         logger.record_tabular(prefix + 'dLoss', loss_before - loss_after)
+        return loss_before
 
     def predict(self, xs):
         """
