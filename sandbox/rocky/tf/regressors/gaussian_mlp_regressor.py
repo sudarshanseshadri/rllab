@@ -176,6 +176,33 @@ class GaussianMLPRegressor(LayersPowered, Serializable):
             self._y_mean_var = y_mean_var
             self._y_std_var = y_std_var
 
+    def loss(self, xs, ys):
+        if self._subsample_factor < 1:
+            num_samples_tot = xs.shape[0]
+            idx = np.random.randint(0, num_samples_tot, int(num_samples_tot * self._subsample_factor))
+            xs, ys = xs[idx], ys[idx]
+
+        sess = tf.get_default_session()
+        if self._normalize_inputs:
+            # recompute normalizing constants for inputs
+            sess.run([
+                tf.assign(self._x_mean_var, np.mean(xs, axis=0, keepdims=True)),
+                tf.assign(self._x_std_var, np.std(xs, axis=0, keepdims=True) + 1e-8),
+            ])
+        if self._normalize_outputs:
+            # recompute normalizing constants for outputs
+            sess.run([
+                tf.assign(self._y_mean_var, np.mean(ys, axis=0, keepdims=True)),
+                tf.assign(self._y_std_var, np.std(ys, axis=0, keepdims=True) + 1e-8),
+            ])
+        if self._use_trust_region:
+            old_means, old_log_stds = self._f_pdists(xs)
+            inputs = [xs, ys, old_means, old_log_stds]
+        else:
+            inputs = [xs, ys]
+        loss = self._optimizer.loss(inputs)
+        return loss
+
     def fit(self, xs, ys):
         if self._subsample_factor < 1:
             num_samples_tot = xs.shape[0]
