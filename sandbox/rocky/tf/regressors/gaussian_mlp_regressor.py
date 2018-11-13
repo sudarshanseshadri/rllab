@@ -99,6 +99,13 @@ class GaussianMLPRegressor(LayersPowered, Serializable):
                     trainable=learn_std,
                 )
 
+            self.trainable_variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES,
+                                            scope='{}/{}'.format(name, 'mean_network'))
+            self.trainable_variables += tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES,
+                                            scope='{}/{}'.format(name, 'log_std_network'))
+            self.trainable_variables += tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES,
+                                            scope='{}/{}'.format(name, 'output_log_std'))
+
             LayersPowered.__init__(self, [l_mean, l_log_std])
 
             xs_var = mean_network.input_layer.input_var
