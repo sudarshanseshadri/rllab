@@ -162,6 +162,7 @@ class ConjugateGradientOptimizer(Serializable):
         if hvp_approach is None:
             hvp_approach = PerlmutterHvp(num_slices)
         self._hvp_approach = hvp_approach
+        self._last_grad_norm = None
 
     def update_opt(self, loss, target, leq_constraint, inputs, extra_inputs=None, constraint_name="constraint", *args,
                    **kwargs):
@@ -287,6 +288,7 @@ class ConjugateGradientOptimizer(Serializable):
                 ipdb.set_trace()
             if loss < loss_before and constraint_val <= self._max_constraint_val:
                 break
+        self._last_grad_norm = np.sum(np.square(cur_step))  # SS store the grad norm
         if (np.isnan(loss) or np.isnan(constraint_val) or loss >= loss_before or constraint_val >=
             self._max_constraint_val) and not self._accept_violation:
             logger.log("Line search condition violated. Rejecting the step!")
