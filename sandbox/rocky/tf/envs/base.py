@@ -71,8 +71,8 @@ class VecTfEnv(object):
     def num_envs(self):
         return self.vec_env.num_envs
 
-    def step(self, action_n):
-        return self.vec_env.step(action_n)
+    def step(self, action_n, model_idx=None):
+        return self.vec_env.step(action_n, model_idx=model_idx)
 
     def terminate(self):
         self.vec_env.terminate()

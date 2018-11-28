@@ -92,8 +92,8 @@ class BatchPolopt(RLAlgorithm):
     def shutdown_worker(self):
         self.sampler.shutdown_worker()
 
-    def obtain_samples(self, itr):
-        return self.sampler.obtain_samples(itr)
+    def obtain_samples(self, itr, max_samples=None, model_idx=None):
+        return self.sampler.obtain_samples(itr, max_samples=max_samples, model_idx=model_idx)
 
     def process_samples(self, itr, paths):
         return self.sampler.process_samples(itr, paths)

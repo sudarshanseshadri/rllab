@@ -36,7 +36,7 @@ class VectorizedSampler(BaseSampler):
     def shutdown_worker(self):
         self.vec_env.terminate()
 
-    def obtain_samples(self, itr):
+    def obtain_samples(self, itr, max_samples=None, model_idx=None):
         logger.log("Obtaining samples for iteration %d..." % itr)
         paths = []
         n_samples = 0
@@ -44,21 +44,25 @@ class VectorizedSampler(BaseSampler):
         dones = np.asarray([True] * self.vec_env.num_envs)
         running_paths = [None] * self.vec_env.num_envs
 
-        pbar = ProgBarCounter(self.algo.batch_size)
+        # For getting fake samples in dtrpo
+        if not max_samples:
+            max_samples = self.algo.batch_size
+
+        pbar = ProgBarCounter(max_samples)
         policy_time = 0
         env_time = 0
         process_time = 0
 
         policy = self.algo.policy
         import time
-        while n_samples < self.algo.batch_size:
+        while n_samples < max_samples:
             t = time.time()
             policy.reset(dones)
             actions, agent_infos = policy.get_actions(obses)
 
             policy_time += time.time() - t
             t = time.time()
-            next_obses, rewards, dones, env_infos = self.vec_env.step(actions)
+            next_obses, rewards, dones, env_infos = self.vec_env.step(actions, model_idx=model_idx)
             env_time += time.time() - t
 
             t = time.time()
