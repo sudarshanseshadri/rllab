@@ -11,12 +11,12 @@ class MLP(LayersPowered, Serializable):
     def __init__(self, name, output_dim, hidden_sizes, hidden_nonlinearity,
                  output_nonlinearity, hidden_W_init=L.XavierUniformInitializer(), hidden_b_init=tf.zeros_initializer(),
                  output_W_init=L.XavierUniformInitializer(), output_b_init=tf.zeros_initializer(),
-                 input_var=None, input_layer=None, input_shape=None, batch_normalization=False, weight_normalization=False,
+                 input_var=None, input_layer=None, input_shape=None, batch_normalization=False, weight_normalization=False, reuse=False
                  ):
 
         Serializable.quick_init(self, locals())
 
-        with tf.variable_scope(name):
+        with tf.variable_scope(name, reuse=reuse):
             if input_layer is None:
                 l_in = L.InputLayer(shape=(None,) + input_shape, input_var=input_var, name="input")
             else:
