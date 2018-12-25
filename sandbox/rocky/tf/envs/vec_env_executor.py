@@ -13,7 +13,7 @@ class VecEnvExecutor(object):
         self.ts = np.zeros(len(self.envs), dtype='int')
         self.max_path_length = max_path_length
 
-    def step(self, action_n):
+    def step(self, action_n, model_idx=None):
         all_results = [env.step(a) for (a, env) in zip(action_n, self.envs)]
         obs, rewards, dones, env_infos = list(map(list, list(zip(*all_results))))
         dones = np.asarray(dones)
